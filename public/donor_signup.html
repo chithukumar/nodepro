@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donor Registration</title>
+    <style>
+        body { background-color: black; color: white; }
+        center { margin-top: 50px; }
+        table { margin: auto; }
+    </style>
+</head>
+<body>
+    <center>
+        <h1>Donor Registration</h1>
+        <form id="signupForm" onsubmit="return validateForm(event)" method="POST">
+            <table>
+                <tr>
+                    <td>Name</td>
+                    <td><input type="text" name="name" placeholder="Enter Your Name" required></td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td><input type="email" name="email" placeholder="Enter your mail id" required></td>
+                </tr>
+                <tr>
+                    <td>Password</td>
+                    <td><input type="password" name="password" placeholder="Enter your password" required></td>
+                </tr>
+                <tr>
+                    <td>Confirm Password</td>
+                    <td><input type="password" name="confirm_password" placeholder="Confirm your password" required></td>
+                </tr>
+                <tr>
+                    <td>Location</td>
+                    <td><input type="text" name="location" placeholder="Enter your location" required></td>
+                </tr>
+                <tr>
+                    <td>Mobile Number</td>
+                    <td><input type="text" name="mobile_number" placeholder="Enter your mobile number" required></td>
+                </tr>
+            </table>
+            <br>
+            <input type="submit" value="Sign Up">
+            <button type="button" onclick="window.location.href='donor_signin.html'">Sign In</button>
+        </form>
+
+        <div id="successMessage" style="display:none; color: green; margin-top: 20px;">
+            Signed up successfully!
+        </div>
+        <div id="errorMessage" style="display:none; color: red; margin-top: 20px;">
+            An error occurred. Please try again.
+        </div>
+    </center>
+
+    <script>
+        function validateForm(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            var password = document.forms["signupForm"]["password"].value;
+            var confirm_password = document.forms["signupForm"]["confirm_password"].value;
+            var mobile_number = document.forms["signupForm"]["mobile_number"].value;
+
+            // Password validation
+            if (password !== confirm_password) {
+                alert("Passwords do not match!");
+                return false;
+            }
+
+            // Mobile number validation
+            var mobilePattern = /^[0-9]{10}$/;
+            if (!mobilePattern.test(mobile_number)) {
+                alert("Please enter a valid 10-digit mobile number.");
+                return false;
+            }
+
+            // If validation passes, send data to the server
+            const formData = new FormData(document.getElementById("signupForm"));
+            fetch('/donor_signup', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text(); // Change to response.json() if your server responds with JSON
+            })
+            .then(data => {
+                console.log(data);
+                document.getElementById("successMessage").style.display = "block";
+                document.getElementById("errorMessage").style.display = "none"; // Hide error message if signup is successful
+                document.getElementById("signupForm").reset(); // Reset form after successful submission
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById("errorMessage").style.display = "block"; // Show error message
+                document.getElementById("successMessage").style.display = "none"; // Hide success message
+            });
+
+            return false; // Prevent the form from submitting if you want to handle it with JavaScript
+        }
+    </script>
+</body>
+</html>
